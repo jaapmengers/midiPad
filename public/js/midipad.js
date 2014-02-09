@@ -5,39 +5,55 @@ var app = angular.module('midiPadApp', ['midiPadControllers']);
 var midiPadControllers = angular.module('midiPadControllers', []);
 
 midiPadControllers.controller('MidiPadCtrl', ['$scope', 'socket', function ($scope, socket) {
-	$scope.bpm = 100;
-	$scope.deltaT = 0;
 
-	var count = 0;
 
 	var interval;
+	var times = [];
+	var tempTimes = [];
+	var current
 
-	socket.on('currentBpm', function(data){	
-		//$scope.bpm = Math.round(data.bpm * 100) / 100;
+	setInterval(function(){
+		if(new Date().getTime() >= _.first(times)){
+			var atTime = times.shift();
+			$scope.color = true;
+			$scope.$apply();
+			setTimeout(function(){
+				$scope.color = false;
+				$scope.$apply();
+			}, 100)
+		}
+	}, 5);
+
+	socket.on('currentBeatDelta', function(data){	
 		var curDate = new Date().getTime();
 
-		var beatFrequencyInMs = (1 / (data.bpm / 60)) * 1000;
-
 		var deltaT = curDate - data.date;
-		var nextStartpointFromNow = 0;
-		if(deltaT > 0){
-			if(deltaT > beatFrequencyInMs) {
-				nextStartpointFromNow = deltaT % beatFrequencyInMs;
-			} else {
-				nextStartpointFromNow = beatFrequencyInMs % deltaT;
-			}
-		}
+		var freq = data.freq;
 
-		setTimeout(function(){
-			clearInterval(interval);
-			interval = setInterval(function(){
-				$scope.color = true;
-				$scope.$apply();
-				setTimeout(function(){
-					$scope.color = false;
-					$scope.$apply();
-				}, beatFrequencyInMs/3);				
-			}, beatFrequencyInMs);
-		}, nextStartpointFromNow);
+		$scope.$apply();
+
+		var nextStartPointFromNow = 0;
+		if(deltaT > freq){
+			nextStartPointFromNow = deltaT % freq;
+		} else {
+			nextStartPointFromNow = freq - deltaT;
+		}
+		
+		tempTimes = [];
+		var offset = -100;
+		var begin = curDate + nextStartPointFromNow + offset;
+		tempTimes.push(begin);
+
+		_(8).times(function(n){
+			tempTimes.push(begin + n * freq);
+		});
+
+		var margin = freq * -0.15;
+		var timesLeft = _.reject(times, function(time){
+			return time >= begin + margin;
+		})
+
+		var combined = _.union(timesLeft, tempTimes);
+		times = combined;
 	});
 }]);

@@ -21,15 +21,20 @@ var input = new midi.input();
 
 // Configure a callback.
 var i = 0;
+var deltas = [];
 input.on('message', function(deltaTime, message) {
 
 		if(message[0] === 248){
+			deltas.push(deltaTime);
 			i++;
-			if(i === (24 * 4)){
-				var bpm = (1/deltaTime / 24) * 60;
+			if(i === (24 * 2)){
+				var avgDeltas = us.reduce(deltas, function(memo, num){ return memo + num; }, 0) / deltas.length;
+				var avgDeltasMs = (1/avgDeltas) * 10;
+				
+				io.sockets.emit("currentBeatDelta", {freq: avgDeltasMs, date: new Date().getTime()});
 				i=0;
-				io.sockets.emit("currentBpm", {bpm: bpm, date: new Date().getTime()});
-				console.log(bpm);
+				deltas = [];
+				console.log("Average", avgDeltasMs);
 			}
 		} else {
 			i =0;
@@ -40,4 +45,5 @@ input.on('message', function(deltaTime, message) {
 input.openVirtualPort("midiPad");
 
 input.ignoreTypes(false, false, false);
+
 //input.closePort();
