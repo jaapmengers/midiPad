@@ -10,7 +10,7 @@ midiPadControllers.controller('MidiPadCtrl', ['$scope', 'socket', function ($sco
 	var interval;
 	var times = [];
 	var tempTimes = [];
-	var current
+	var timeDiffs = [];
 
 	setInterval(function(){
 		if(new Date().getTime() >= _.first(times)){
@@ -24,13 +24,38 @@ midiPadControllers.controller('MidiPadCtrl', ['$scope', 'socket', function ($sco
 		}
 	}, 5);
 
+	var curDate;
+	function startTime(){
+		curDate = new Date().getTime();
+		socket.emit('ping');
+	}
+
+	socket.on('pong', function(){
+		var newDate = new Date().getTime();
+		var diff = newDate - curDate;
+
+		//Keep a running average of the last 10 response times. 
+		timeDiffs = _.last(timeDiffs, 10);
+		timeDiffs.push(diff/2);
+	});
+
+
+	//Get an initial reading of the response time between client and server
+	//After that, update the average responsetime every 10 seconds.
+	setInterval(function(){
+		startTime();
+	}, 10000);
+
+
+
 	socket.on('currentBeatDelta', function(data){	
+
 		var curDate = new Date().getTime();
 
-		var deltaT = curDate - data.date;
+		var curDiffs = timeDiffs;
+		var sum = _.reduce(curDiffs, function(memo, num){ return memo + num}, 0);
+		var deltaT = sum > 0 && curDiffs.length > 0 ? sum / curDiffs.length : 0;
 		var freq = data.freq;
-
-		$scope.$apply();
 
 		var nextStartPointFromNow = 0;
 		if(deltaT > freq){

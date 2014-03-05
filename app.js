@@ -31,7 +31,7 @@ input.on('message', function(deltaTime, message) {
 				var avgDeltas = us.reduce(deltas, function(memo, num){ return memo + num; }, 0) / deltas.length;
 				var avgDeltasMs = (1/avgDeltas) * 10;
 				
-				io.sockets.emit("currentBeatDelta", {freq: avgDeltasMs, date: new Date().getTime()});
+				io.sockets.emit("currentBeatDelta", {freq: avgDeltasMs});
 				i=0;
 				deltas = [];
 				console.log("Average", avgDeltasMs);
@@ -39,6 +39,17 @@ input.on('message', function(deltaTime, message) {
 		} else {
 			i =0;
 		}
+});
+
+
+io.sockets.on('connection', function(socket){
+
+	console.log('Connection');
+
+	socket.on('ping', function(){
+		console.log("Receiving ping");
+		socket.emit('pong');
+	});
 });
 
 // Create a virtual input port.
