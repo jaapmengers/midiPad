@@ -47,6 +47,10 @@ midiPadControllers.controller('MidiPadCtrl', ['$scope', 'socket', function ($sco
 	}, 10000);
 
 
+	socket.on('changeColor', function(color){
+    	angular.element(document.querySelector('#adjustable')).html("body.active {background: -webkit-radial-gradient(center center, 80% 200%, " + color + ", black); }");
+	});
+
 
 	socket.on('currentBeatDelta', function(data){	
 
