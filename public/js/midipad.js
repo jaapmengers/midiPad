@@ -15,10 +15,10 @@ midiPadControllers.controller('MidiPadCtrl', ['$scope', 'socket', function ($sco
 	setInterval(function(){
 		if(new Date().getTime() >= _.first(times)){
 			var atTime = times.shift();
-			$scope.color = true;
+			$scope.active = true;
 			$scope.$apply();
 			setTimeout(function(){
-				$scope.color = false;
+				$scope.active = false;
 				$scope.$apply();
 			}, 100)
 		}
@@ -48,7 +48,8 @@ midiPadControllers.controller('MidiPadCtrl', ['$scope', 'socket', function ($sco
 
 
 	socket.on('changeColor', function(color){
-    	angular.element(document.querySelector('#adjustable')).html("body.active {background: -webkit-radial-gradient(center center, 80% 200%, " + color + ", black); }");
+			console.log("New color", color);
+    	angular.element(document.querySelector('#adjustable')).html("body.active {background: -webkit-radial-gradient(center center, 80% 200%, rgb(" + color.r + ',' + color.g + ',' + color.b + "), black); }");
 	});
 
 

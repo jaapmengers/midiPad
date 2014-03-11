@@ -13,6 +13,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-sanitize.min.js"></script>
     <script src="../js/hammer.js/hammer.min.js"></script>
     <script src="../js/TouchService.js"></script>
+    <script src="../socket.io/socket.io.js"></script>
+    <script src="../js/services.js"></script>
     <script src="../js/touch.js"></script>
     <style>
      body, html{
@@ -22,6 +24,6 @@
      </style>
   </head>
 
-  <body id="main" ng-controller="TouchCtrl" style="background-color: rgb({{rotation}}, {{center.x}}, {{center.y}})">
+  <body id="main" ng-controller="TouchCtrl" style="background-color: rgb({{r}}, {{g}}, {{b}})">
   </body>
 </html>

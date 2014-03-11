@@ -43,7 +43,6 @@ var deltas = [];
 
 setInterval(function(){
 	io.sockets.emit("currentBeatDelta", {freq: 1000});
-	console.log("Blalalala");
 }, 10000)
 
 io.sockets.on('connection', function(socket){
@@ -53,6 +52,11 @@ io.sockets.on('connection', function(socket){
 	socket.on('ping', function(){
 		console.log("Receiving ping");
 		socket.emit('pong');
+	});
+
+	socket.on('updateColor', function(data){
+		console.log(data);
+		io.sockets.emit('changeColor', data);
 	});
 });
 

@@ -25,7 +25,7 @@
     	}
     </style>
     <style id="adjustable">
-        body.colored{
+        body.active{
             transition: background 0.025s;
             background: -webkit-radial-gradient(center center, 80% 200%, red, black); 
                 background-color: black;
@@ -33,6 +33,6 @@
     </style>
   </head>
 
-  <body ng-controller="MidiPadCtrl" ng-class="{colored: color}">
+  <body ng-controller="MidiPadCtrl" ng-class="{active: active}">
   </body>
 </html>
